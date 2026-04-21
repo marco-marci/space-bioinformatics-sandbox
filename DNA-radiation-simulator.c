@@ -30,9 +30,9 @@ int is_survived(char dna[], int length) {
     float percentage = ((float)count / length) * 100;
     
     if(percentage >= 30.0) {
-        return 0; // Morta
+        return 0; // Dead
     } else {
-        return 1; // Sopravvissuta
+        return 1; // Survived
     }
 }
 
@@ -44,23 +44,23 @@ int main() {
     int len = strlen(dna);
     char modified_dna[len + 1]; 
 
-    printf("SEQUENZA DNA ORIGINALE: %s\n", dna);
+    printf("MAIN DNA SEQUENCE: %s\n", dna);
     
-    printf("Inserisci il livello di radiazioni (1-10): ");
+    printf("Insert the level of radiations (1-10): ");
     do {
         scanf("%d", &radiationlevel);
     } while(radiationlevel < 1 || radiationlevel > 10);
 
     mutation(dna, modified_dna, len, radiationlevel);
 
-    printf("\nSEQUENZA DNA MODIFICATA: %s", modified_dna);
-    printf("\nIn totale sono avvenute: %d MUTAZIONI", mutationcounter(modified_dna, len));
+    printf("\nMODIFIED DNA SEQUENCE: %s", modified_dna);
+    printf("\nIn total occured %d mutations", mutationcounter(modified_dna, len));
 
-    // Controllo sopravvivenza
+    // Cell status check
     if(is_survived(modified_dna, len)) {
-        printf("\nESITO: La cellula e' SOPRAVVISSUTA.\n");
+        printf("\nOUTCOME: the cell survived\n");
     } else {
-        printf("\nESITO: La cellula e' NON SOPRAVVISSUTA (Danno critico).\n");
+        printf("\nOUTCOME: the cell died (critical damage)\n");
     }
 
     return 0;
