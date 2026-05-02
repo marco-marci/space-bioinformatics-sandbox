@@ -3,29 +3,60 @@
 #include <string.h>
 #include <time.h>
 
-void mutation(char *inputdna,char *outputdna,const int level) {
-    int i;
-    for(i=0; inputdna[i]  ; i++) {
-        if(inputdna[i]=='A' || inputdna[i]=='G'){
-            if((rand() % 15) < level) {
-                outputdna[i] = 'X';
-            }
-            else {
-                outputdna[i] = inputdna[i];
-            }
-        }
-        else{
-            if((rand() % 20) < level) {
-                outputdna[i] = 'X';
-            }
-            else {
-                outputdna[i] = inputdna[i];
-            }
-        }
-    }
-    
-    outputdna[i]= '\0'; 
+float probability(int location){
+    if(location==1)     //ISS
+        return 0.0001f;
+    if(location==2)     //Mars
+        return 0.0005f;
+    if(location==3)     //Deep space
+        return 0.005f;
+    return 0.000001f; //Earth
 }
+
+char basechanges(char original){
+    char bases[4]={'A','G','C','T'};
+    int flag=0,value;
+    char modified;
+    do{
+        value=rand()%4;
+        if(bases[value]!=original){
+            modified=bases[value];
+            flag=1;
+        }
+    }while (flag!=1);
+
+    return modified;
+}
+
+
+int is_survived(int count,int length) {
+    float percentage = ((float)count / length) * 100;
+    
+    if(percentage >= 30.0) {
+        return 0; // DEAD
+    } else {
+        return 1; // SAFE
+    }
+}
+
+
+void mutation(char *inputdna,char *outputdna,int location){
+    int i,counter=0;
+    for(i=0;inputdna[i];i++){
+        if(((float)(rand())/RAND_MAX)<=probability(location)){  //now it changes bases
+            outputdna[i]=basechanges(inputdna[i]);
+            counter++;
+        }
+        else
+            outputdna[i]=inputdna[i];
+    }
+    outputdna[i]='\0';
+    printf("\nThis DNA has in total %d mutations",counter);
+    printf("\nSurvival Status: %s",is_survived(counter, strlen(inputdna)) ? "SAFE" : "DEAD");
+}
+
+
+//
 
 int mutationcounter(char *dna) {
     int count=0;
@@ -35,17 +66,6 @@ int mutationcounter(char *dna) {
         }
     }
     return count;
-}
-
-int is_survived(char *dna,const int length) {
-    int count = mutationcounter(dna);
-    float percentage = ((float)count / length) * 100;
-    
-    if(percentage >= 30.0) {
-        return 0; // Morta
-    } else {
-        return 1; // Sopravvissuta
-    }
 }
 
 int purines_counter (char *dna){ //purines are more exposed to damages by radiations
@@ -68,48 +88,33 @@ int comparator (char *dna_1,char *dna_2){
 int main() {
     srand(time(NULL)); 
     
-    int radiationlevel = 0;
     char dna[] = "ATGCGATACGTTGCAATCGACTGACTAGCTAGCTAGCT";
     char dna_2[]="ATGGGCCTATTAGGCTATACGGGCTAGTAAGCCATATC";
-    int len = strlen(dna);
-    int len_2=strlen(dna_2);
-    char modified_dna[len + 1];
-    char modified_dna_2[len_2 + 1];
+    char modified_dna[strlen(dna) + 1];
+    char modified_dna_2[strlen(dna_2) + 1];
+
+    int location;
+    printf("Insert the number of the location you want to simulate:\n1) ISS\n2) Mars\n3) Deep Space\n4) Earth");
+    do{
+        scanf("%d",&location);
+    }while(location<1 || location >4);
 
 
     printf("FIRST ORIGINAL DNA SEQUENCE: %s\n", dna);
     printf("SECOND ORIGINAL DNA SEQUENCE: %s\n", dna_2);
     
-    printf("Insert the radiation level (1-10): ");
-    do {
-        scanf("%d", &radiationlevel);
-    } while(radiationlevel < 1 || radiationlevel > 10);
+    //OUTPUT
 
-    printf("Based on the number of purines the %s dna sequence is the most susceptible to damage",comparator(dna,dna_2) ? "FIRST" : "SECOND");
+    printf("\nBased on the number of purines the %s dna sequence is the most susceptible to damage",comparator(dna,dna_2) ? "FIRST" : "SECOND");
+    printf("\nFIRST DNA SEQUENCE:\n");
+    mutation(dna, modified_dna, location);
+    printf("\nMODIFIED DNA SEQUENCE: %s", modified_dna);
 
-    mutation(dna, modified_dna, radiationlevel);
-    mutation(dna_2,modified_dna_2,radiationlevel);
+    printf("\n SECOND DNA SEQUENCE:\n");
+    mutation(dna_2,modified_dna_2,location);
+    printf("\nMODIFIED DNA SEQUENCE: %s", modified_dna_2);
 
-    //output 
 
-    printf("\nFIRST MODIFIED DNA SEQUENCE: %s", modified_dna);
-    printf("\nIn total there are: %d MUTATIONS", mutationcounter(modified_dna, len));
-
-    printf("\nSECOND MODIFIED DNA SEQUENCE: %s", modified_dna_2);
-    printf("\nIn total there are: %d MUTATIONS", mutationcounter(modified_dna_2, len_2));
-
-    // Check survival rate
-    if(is_survived(modified_dna, len)) {
-        printf("\nCONCLUSION: The cell n°1 survived.\n");
-    } else {
-        printf("\nCONCLUSION: The cell n°1 died (critical damage).\n");
-    }
-
-    if(is_survived(modified_dna_2, len_2)) {
-        printf("\nCONCLUSION: The cell n°2 survived.\n");
-    } else {
-        printf("\nCONCLUSION: The cell n°2 died (critical damage).\n");
-    }
-
+    
     return 0;
 }
