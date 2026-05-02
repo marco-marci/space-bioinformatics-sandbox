@@ -43,7 +43,7 @@ int is_survived(int count,int length) {
 void mutation(char *inputdna,char *outputdna,int location){
     int i,counter=0;
     for(i=0;inputdna[i];i++){
-        if(((float)(rand())/RAND_MAX)<=probability(location)){  //now it changes bases
+        if((((float)(rand()))/RAND_MAX)<=probability(location)){  //now it changes bases
             outputdna[i]=basechanges(inputdna[i]);
             counter++;
         }
