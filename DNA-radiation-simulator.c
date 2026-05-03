@@ -42,10 +42,24 @@ int is_survived(int count,int length) {
 
 void mutation(char *inputdna,char *outputdna,int location){
     int i,counter=0;
+    float prob=probability(location);
     for(i=0;inputdna[i];i++){
-        if((((float)(rand()))/RAND_MAX)<=probability(location)){  //now it changes bases
-            outputdna[i]=basechanges(inputdna[i]);
-            counter++;
+        float base_prob;
+        if(inputdna[i]=='G')    //WEIGHTING LOGIC
+            base_prob=prob*1.5; //increase of 50%
+        else if(inputdna[i]=='A')
+            base_prob=prob*1.2; //increase of 20%
+        else  
+            base_prob=prob;
+        if((((float)(rand()))/RAND_MAX)<=base_prob){          //now it changes bases
+            if(((float)(rand())/RAND_MAX)<=base_prob*0.1){    //chain rupture probability
+                outputdna[i]='X';
+                counter+=5;             //more damage
+            }
+            else{
+                outputdna[i]=basechanges(inputdna[i]);
+                counter++;
+            }
         }
         else
             outputdna[i]=inputdna[i];
